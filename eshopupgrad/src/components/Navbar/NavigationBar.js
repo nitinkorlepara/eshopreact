@@ -1,18 +1,16 @@
 import { AppBar, Box, Button, Typography, Stack, TextField, InputAdornment } from "@mui/material";
-import Cart from "@mui/icons-material/ShoppingCart";
+import ShoppingCart from "@mui/icons-material/ShoppingCart";
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { Link } from "react-router-dom";
-import { useState } from "react";
 
 
-const NavigationBar = ({page}) => {
-    const [user, setUser] = useState("admin");
+const NavigationBar = ({page, user}) => {
     return <>
       <Box sx={{flexGrow : 1}}>
         <AppBar position="static" sx={{backgroundColor : "#3f51b5", padding : "16px 28px"}}>
                 <Stack useFlexGap justifyContent="space-between" direction="row" alignItems="center">
                     <Stack useFlexGap direction={"row"}>
-                        <Cart/>
+                        <ShoppingCart/>
                         <Typography variant="body1" sx={{flexGrow : 1, marginLeft : 1}}> upGrad E-Shop </Typography>
                     </Stack>
                     {
