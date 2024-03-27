@@ -1,15 +1,22 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 
-const CategoriesToggle = () => {
-  const[categories] = useState(["all", "apparel", "electronics", "footwear", "personal care"]);
+const CategoriesToggle = ({data, setCategory}) => {
+
+
+  const[categories, setCategories] = useState(["all"]);
   const[activeCategory, setActiveCategory] = useState("all");
 
   const handleCategoryChange = (e) => {
     setActiveCategory(e.target.value);
+    setCategory(e.target.value)
   }
+
+  useEffect(()=>{
+    if(data) setCategories(["all", ...data])
+  },[data]);
 
   return (
     <>

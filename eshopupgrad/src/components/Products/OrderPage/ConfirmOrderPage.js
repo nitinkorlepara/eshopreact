@@ -1,12 +1,16 @@
 import React from 'react';
 import { Stack, Button, Paper, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const ConfirmOrderPage = ({setStep, productInfo}) => {
 
     const {productQty, productDetails} = productInfo;
+    const totalPrice = productQty * productDetails.price;
+
+    const navigate = useNavigate();
 
     const address = {
-        name : "Lucknow Home",
+        name : "Ryan Sommerfield",
         contactNumber : "1234567890",
         street : "Police Line",
         landmark : "Futala Lake",
@@ -15,12 +19,17 @@ const ConfirmOrderPage = ({setStep, productInfo}) => {
         zipcode : "441901"
     }
 
-    const handleReturnToAddressPage = () =>{
+    const handleReturnToAddressPage = () =>{ //Go back to select address page
         setStep(1);
     }
 
-    const handlePlaceOrder = () =>{
-
+    const handlePlaceOrder = () =>{ //Handle the request to place the order and navigate back to /products route(homepage) 
+        navigate('/products', {
+            state : {
+                message : 'Order placed successfully',
+                color : 'green'
+            }
+        })
     };
 
     console.log('product details : '+ JSON.stringify(productInfo));
@@ -38,7 +47,7 @@ const ConfirmOrderPage = ({setStep, productInfo}) => {
                 <Typography variant='body2' sx={{mt : 2}}>Quantity: <span style={{fontWeight : 'bold'}}>{productQty}</span></Typography>
                 <Typography variant='body2' sx={{mt : 2}}>Category: <span style={{fontWeight : 'bold'}}>{productDetails.category.charAt(0).toUpperCase() + productDetails.category.slice(1)}</span></Typography>
                 <Typography variant='subtitle2' sx={{mt : 4, fontStyle : 'italic'}}>{productDetails.description}</Typography>
-                <Typography variant='h5' sx={{mt : 4, color : 'red'}}>Total Price : ₹{productDetails.price}</Typography>
+                <Typography variant='h5' sx={{mt : 4, color : 'red'}}>Total Price : ₹{totalPrice}</Typography>
             </Paper>
 
             {/* Right Side Sub-Section */}

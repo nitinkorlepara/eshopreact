@@ -1,55 +1,129 @@
-import React, { useState } from 'react';
-import { Button, Card, CardActions, CardContent, CardMedia, IconButton, Stack, Typography } from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import { Button, Card, CardActions, CardContent, CardMedia, IconButton, 
+    Stack, Typography, Dialog, DialogActions, DialogTitle,  DialogContent, DialogContentText} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Link } from 'react-router-dom';
+import MessageBox from '../TimedMessageBox/MessageBox';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setActiveProduct } from '../../common/store/actions/productActions';
+import { deleteProductService } from '../../common/services/adminProductServices';
 
-const DisplayCard = () => {
-    const[user] = useState("admin"); 
 
-    const[product] = useState({
-        id : 1320,
-        name : "Shoes",
-        price : "1000",
-        description : "There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable.",
-        imageURL : "https://static.nike.com/a/images/t_PDP_1280_v1/f_auto,q_auto:eco/99486859-0ff3-46b4-949b-2d16af2ad421/custom-nike-dunk-high-by-you-shoes.png"
+const DisplayCard = ({productData, user}) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [open, setOpen] = useState(false);
+  const[messageBoxState, setShowMessage] = useState(false); //For displaying feedback if product deleted 
+  const[messageDetails, setMessageDetails] = useState({
+    messageText : '',
+    messageColor : ''
+  });
+   
+  const handleOpenBox = () => { //Needs to be created to switch the message box state to first show it and after an interval hide it
+    setShowMessage(true);
+    setTimeout(()=>{
+      setShowMessage(false);
+      window.location.reload();
+    }, 2000);
+   };
+
+  const handleDialogOpen = () => {
+    setOpen(true);
+  };
+
+  const handleDialogClose = () => {
+    setOpen(false);
+  };
+
+  const handleBuyProduct = () => {
+    dispatch(setActiveProduct(productData.id));
+    navigate(`/products/${productData.id}`);
+  };
+
+  const handleModifyProduct = () => {
+    navigate('/products/modify',{
+        state : {
+            productData
+        }
     })
+  }
+
+  const handleDeleteProduct = () => {
+    deleteProductService(productData.id).then((response)=>{
+        setMessageDetails({...messageDetails, messageText : 'Order Deleted Successfully!', messageColor : 'green'});
+    }).catch((error)=>{
+        setMessageDetails({...messageDetails, messageText : 'Some error occured while product deletion!', messageColor : 'red'});
+    })
+    handleDialogClose();
+    handleOpenBox();
+  }
+
+
 
     return (
-        <Card sx={{width : 300, margin : 10}}>
-            <CardMedia 
-            sx={{height : 200}} 
-            image={product.imageURL}
-            title={product.name}/>
-            <CardContent>
-                <Stack direction={"row"} justifyContent={"space-between"}>
-                    <Typography gutterBottom variant="h6">
-                        {product.name}
-                    </Typography>
-                    <Typography gutterBottom variant="h6">
-                    ₹{product.price}
-                    </Typography>
-                </Stack>
-                <Typography variant="body2">
-                  {product.description}
-                </Typography>
-            </CardContent>
-            <CardActions sx={{display : 'flex', flexDirection : 'row', justifyContent : 'space-between'}}>
-            <Link to={`/products/${product.id}`}><Button size="small" variant="contained" sx={{backgroundColor : "#3f51b5"}}>Buy</Button></Link>
-                   {
-                    user === "admin" ?
-                      <div>
-                          <IconButton>
-                            <EditIcon/>
-                          </IconButton>
-                          <IconButton>
-                            <DeleteIcon/>
-                          </IconButton>
-                      </div>
-                     : <></>
-                   }
-                </CardActions>
-        </Card>
+      <Card sx={{ width: 315, height: '88%', mt: '4vh', mb: '3vh' }}>
+      <CardMedia
+          component="img"
+          image={productData.imageUrl}
+          sx={{ width: '100%', height: 200, objectFit: 'cover' }}
+          title={productData.name}
+      />
+
+      <CardContent sx={{ minHeight: 120 }}>
+          <Stack direction="row" justifyContent="space-between">
+              <Typography gutterBottom variant="h6" sx={{ fontSize: '1.1rem', flexGrow: 1 }}>
+                  {productData.name}
+              </Typography>
+              <Typography gutterBottom variant="h6" sx={{ fontSize: '1.1rem' }}>
+                  ₹{productData.price}
+              </Typography>
+          </Stack>
+          <Typography color="gray" variant="body2" sx={{ fontWeight: 100 }}>
+              {productData.description.length > 120 ? `${productData.description.slice(0, 120)}...` : productData.description}
+          </Typography>
+      </CardContent>
+
+      <CardActions sx={{ display: 'flex', justifyContent: 'space-between', alignItems : 'center' }}>
+          <Button onClick={handleBuyProduct} size="small" variant="contained" sx={{ backgroundColor: "#3f51b5" }}>Buy</Button>
+          {user === "admin" &&
+              <div>
+                  <IconButton onClick={handleModifyProduct}>
+                      <EditIcon />
+                  </IconButton>
+                  <IconButton onClick={handleDialogOpen}>
+                      <DeleteIcon />
+                  </IconButton>
+              </div>
+          }
+      </CardActions>
+
+      <Dialog
+        open={open}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Confirm deletion of product!"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete the product?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button variant='contained' sx={{backgroundColor : '#3f51b5'}} onClick={handleDeleteProduct}>OK</Button>
+          <Button variant='outlined' sx={{color : '#3f51b5'}} onClick={handleDialogClose} autoFocus>
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <MessageBox messageState={messageBoxState} message={messageDetails.messageText} bgcolor={messageDetails.messageColor}/>
+        
+  </Card>
     );
 };
 
