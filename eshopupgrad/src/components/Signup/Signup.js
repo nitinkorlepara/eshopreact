@@ -12,8 +12,6 @@ const Signup = () => {
         {text : "Administrator", value : "admin"},
         {text : "User", value : "user"},
       ]; 
-
-      const [userRoleValue, setUserRoleValue] = useState("");
       const [cnfPassword, setConfirmPasswordVal] = useState("");
       const [userInputs,setUserInputs] = useState({
         "email": "",
@@ -24,9 +22,7 @@ const Signup = () => {
         "role": []
       });
 
-      useEffect(()=>{
-        setUserInputs({...userInputs, role : [`${userRoleValue}`]})
-      },[userRoleValue]);
+   
 
       const StyledArrow = styled(KeyboardArrowDownIcon)({
         borderLeft: '1px solid gray', // Add left border to the icon
@@ -67,10 +63,7 @@ const Signup = () => {
             return;
         }
 
-        if(userRoleValue.length === 0){
-            alert('Please select a user role');
-            return;
-        }
+
 
         signNewUserToApp(userInputs).then((response)=>{
             console.log(response);
@@ -95,36 +88,7 @@ const Signup = () => {
         <TextField sx={{ marginTop : 1, width : 1/4 }} onChange={(e)=>setConfirmPasswordVal(e.target.value)} value={cnfPassword} label="Confirm Password" variant="outlined" autoComplete='off' required/>
         <TextField sx={{ marginTop : 1, width : 1/4 }} onChange={(e)=>setUserInputs({...userInputs, contactNumber : e.target.value})} value={userInputs.contactNumber} label="Contact Number" variant="outlined" autoComplete='on' required/> 
         <FormControl sx={{width: 1/4, mt :  1}}>
-        <Select
-          id="user-role"
-          size="small"
-          renderValue={(selected) => {
-            if (selected.length === 0) {
-              return <span style={{ color: "gray" }}>Select User Role (Added for easy testing) *</span>;
-            } else {
-              return userRoles.find((item) => item.value === selected).text;
-            }
-          }}
-          displayEmpty
-          IconComponent={StyledArrow}
-          sx={{
-            width: '100%',
-            "& .MuiSelect-icon": {
-              transform: "none", // Reset the transformation of the default icon
-            },
-            "&:hover .MuiSelect-icon": {
-              transform: "none", // Reset the transformation of the icon on hover
-            },
-          }}
-          value={userRoleValue}
-          onChange={(e) => setUserRoleValue(e.target.value)}
-        >
-          {userRoles.map((item, index) => (
-            <MenuItem key={index} value={item.value}>
-              {item.text}
-            </MenuItem>
-          ))}
-        </Select>
+        
       </FormControl>
         <Button onClick={handleSignupNewUser} variant="contained" sx={{backgroundColor : '#3f51b5', marginTop : 2, width : 1/4}}> SIGN UP </Button>
         <div style={{marginTop : "16px", textAlign: 'end', width : '25%'}}>
